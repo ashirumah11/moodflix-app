@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MoodFlix — Find Your Mood. Discover Your Movie.{% endblock %}</title>
+  <meta name="description" content="Discover movies and TV shows tuned precisely to your current emotional state. Cinematic recommendations powered by mood.">
+  <!-- Referrer policy required for YouTube embed compatibility (prevents Error 153) -->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="icon" href="{% static 'images/favicon.svg' %}" type="image/svg+xml">
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Core MoodFlix Stylesheets -->
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="{% static 'css/movies.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Global CSRF Token holder for AJAX Fetch calls -->
+  {% csrf_token %}
+
+  <!-- Top Sticky Navbar -->
+  {% include 'includes/navbar.html' %}
+
+  <!-- Dismissible Toast Messages Container -->
+  {% include 'includes/messages.html' %}
+
+  {% if not tmdb_configured and debug %}
+  <div class="tmdb-config-notice" role="status">
+    Live TMDB data is not configured. Add a TMDB API key or read-access token to <code>.env</code> to use current movies, posters, and trailers.
+  </div>
+  {% endif %}
+
+  <!-- Main Dynamic Page Content -->
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Global Trailer Video Player Modal -->
+  <div id="trailerModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="trailerModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="trailerModalTitle" style="font-size: 1.1rem; color: #fff;">Official Trailer</h3>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <a id="trailerExternalLink" href="" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" style="display: none; font-size: 0.8rem; padding: 0.3rem 0.6rem; color: #C4B5FD;" title="Watch directly on YouTube if embed is restricted">
+            Open on YouTube ↗
+          </a>
+          <button id="closeTrailerBtn" class="toast-close-btn" aria-label="Close modal" style="font-size: 1.5rem;">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body" id="trailerModalBody">
+        <!-- Loading Spinner State -->
+        <div id="trailerLoading" style="display: none; position: absolute; inset: 0; align-items: center; justify-content: center; background: #0B0B10; color: var(--text-secondary); font-size: 1rem; z-index: 5;">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
+            <div class="spinner"></div>
+            <span>Finding official trailer...</span>
+          </div>
+        </div>
+        <!-- Error Notice State -->
+        <div id="trailerErrorNotice" style="display: none; position: absolute; inset: 0; align-items: center; justify-content: center; background: #0B0B10; color: var(--text-secondary); padding: 2rem; text-align: center; z-index: 5;">
+          <div>
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎬</div>
+            <p id="trailerErrorMessage" style="font-size: 1.05rem; color: #fff; margin-bottom: 1rem;">Sorry, no trailer is currently available for this movie.</p>
+            <button id="trailerDismissBtn" class="btn btn-secondary btn-sm">Close</button>
+          </div>
+        </div>
+        <iframe id="trailerIframe" src="" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; accelerometer; gyroscope" allowfullscreen title="Movie or TV show official trailer"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Footer -->
+  {% include 'includes/footer.html' %}
+
+  <!-- Vanilla JavaScript Modules -->
+  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/watchlist.js' %}"></script>
+  <script src="{% static 'js/search.js' %}"></script>
+  <script src="{% static 'js/mood.js' %}"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

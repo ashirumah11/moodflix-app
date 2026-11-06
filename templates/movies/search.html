@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if query %}Search results for "{{ query }}" — MoodFlix{% else %}Search Movies & TV Shows — MoodFlix{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-bottom: var(--spacing-3xl);">
+  <!-- Search Hero Header -->
+  <div class="search-hero">
+    <h1 style="font-size: clamp(2rem, 4vw, 3rem);">Search Catalog</h1>
+    <p style="font-size: 1.05rem; color: var(--text-secondary); margin-top: 0.35rem;">
+      Find any movie, television series, actor, or keyword across our entire library.
+    </p>
+
+    <!-- Search Form with Live Suggestion Dropdown -->
+    <form action="{% url 'movies:search' %}" method="get" class="search-input-wrapper">
+      <span class="search-icon-left">🔍</span>
+      <input
+        type="text"
+        name="q"
+        id="mainSearchInput"
+        class="search-input-large"
+        placeholder="Search movies, TV shows, actors..."
+        value="{{ query }}"
+        autocomplete="off"
+        autofocus
+      />
+      <button type="button" id="searchClearBtn" class="search-clear-btn" aria-label="Clear search input">&times;</button>
+      <div id="liveSearchDropdown" class="live-search-dropdown"></div>
+
+      <!-- Retain active filters if search query is changed -->
+      {% if selected_media %}<input type="hidden" name="type" value="{{ selected_media }}">{% endif %}
+      {% if selected_genre %}<input type="hidden" name="genre" value="{{ selected_genre }}">{% endif %}
+    </form>
+  </div>
+
+  {% if query %}
+  <!-- Filter & Refinement Bar -->
+  <div class="filter-card">
+    <form method="get" class="filter-form">
+      <input type="hidden" name="q" value="{{ query }}">
+
+      <div class="filter-item">
+        <label for="searchMediaType">Type</label>
+        <select name="type" id="searchMediaType" class="filter-select" onchange="this.form.submit()">
+          <option value="all" {% if selected_media == 'all' %}selected{% endif %}>All Media</option>
+          <option value="movie" {% if selected_media == 'movie' %}selected{% endif %}>Movies Only</option>
+          <option value="tv" {% if selected_media == 'tv' %}selected{% endif %}>TV Shows Only</option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label for="searchGenreSelect">Genre</label>
+        <select name="genre" id="searchGenreSelect" class="filter-select" onchange="this.form.submit()">
+          <option value="">All Genres</option>
+          {% for g in genres %}
+          <option value="{{ g.id }}" {% if selected_genre == g.id %}selected{% endif %}>{{ g.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label for="searchRating">Min Rating</label>
+        <select name="rating" id="searchRating" class="filter-select" onchange="this.form.submit()">
+          <option value="0" {% if selected_rating == 0 %}selected{% endif %}>Any Rating</option>
+          <option value="7" {% if selected_rating == 7 %}selected{% endif %}>★ 7.0+</option>
+          <option value="8" {% if selected_rating == 8 %}selected{% endif %}>★ 8.0+</option>
+        </select>
+      </div>
+
+      <div style="display: flex; gap: var(--spacing-sm); align-self: flex-end;">
+        <noscript>
+          <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+        </noscript>
+        <a href="{% url 'movies:search' %}?q={{ query }}" class="btn btn-ghost btn-sm">Reset</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Search Results Count Banner -->
+  <div style="margin-bottom: var(--spacing-lg); font-size: 1rem; color: var(--text-secondary);">
+    Found <strong>{{ total_results }}</strong> result{{ total_results|pluralize }} for "<span style="color: var(--text-primary);">{{ query }}</span>"
+  </div>
+
+  <!-- Results Grid -->
+  {% if page_obj.object_list %}
+  <div class="movies-grid">
+    {% for item in page_obj.object_list %}
+      {% include 'includes/movie_card.html' with item=item %}
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <div class="pagination-wrapper">
+    {% if page_obj.has_previous %}
+    <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}&type={{ selected_media }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}" class="page-btn">
+      &larr; Previous
+    </a>
+    {% else %}
+    <span class="page-btn disabled">&larr; Previous</span>
+    {% endif %}
+
+    <span class="page-btn active">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+    <a href="?q={{ query }}&page={{ page_obj.next_page_number }}&type={{ selected_media }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}" class="page-btn">
+      Next &rarr;
+    </a>
+    {% else %}
+    <span class="page-btn disabled">Next &rarr;</span>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🔍</div>
+    <h2 class="empty-title">No matching titles found</h2>
+    <p class="empty-desc">
+      We couldn't find any movies or TV series matching "{{ query }}". Check your spelling or try exploring by mood instead.
+    </p>
+    <a href="{% url 'recommendations:mood_selection' %}" class="btn btn-primary">
+      ✨ Explore by Mood
+    </a>
+  </div>
+  {% endif %}
+
+  {% else %}
+  <!-- Empty Initial Search State -->
+  <div class="empty-state">
+    <div class="empty-icon">🍿</div>
+    <h2 class="empty-title">Ready when you are</h2>
+    <p class="empty-desc">
+      Type a title, actor, or genre above, or jump into our mood discovery platform to find entertainment based on your feelings.
+    </p>
+    <a href="{% url 'recommendations:mood_selection' %}" class="btn btn-primary">
+      Discover by Mood
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+# Normalize line endings to LF in the repository;
+# Git will handle checkout conversions per-platform.
+* text=auto eol=lf
+
+# Explicitly binary — never mangle these
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text eol=lf

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Trending Movies & TV Shows — MoodFlix{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: var(--spacing-2xl); padding-bottom: var(--spacing-3xl);">
+  <div class="section-header" style="flex-wrap: wrap; gap: var(--spacing-md); margin-bottom: var(--spacing-2xl);">
+    <div>
+      <h1 style="font-size: clamp(1.8rem, 4vw, 2.8rem);">Trending Entertainment</h1>
+      <p style="font-size: 1rem; color: var(--text-secondary); margin-top: 0.25rem;">
+        What the world is watching and discussing right now.
+      </p>
+    </div>
+
+    <!-- Time Window Toggle -->
+    <div style="display: flex; gap: 0.5rem; background: var(--bg-card); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <a href="?window=day" class="btn btn-sm {% if time_window == 'day' %}btn-primary{% else %}btn-ghost{% endif %}">
+        Trending Today
+      </a>
+      <a href="?window=week" class="btn btn-sm {% if time_window == 'week' %}btn-primary{% else %}btn-ghost{% endif %}">
+        This Week
+      </a>
+    </div>
+  </div>
+
+  <!-- Trending Movies -->
+  <div style="margin-bottom: var(--spacing-3xl);">
+    <div class="section-header">
+      <h2 class="section-title">Trending Movies</h2>
+    </div>
+    <div class="movies-grid">
+      {% for item in trending_movies %}
+        {% include 'includes/movie_card.html' with item=item %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Trending TV Shows -->
+  <div>
+    <div class="section-header">
+      <h2 class="section-title">Trending Television Series</h2>
+    </div>
+    <div class="movies-grid">
+      {% for item in trending_tv %}
+        {% include 'includes/movie_card.html' with item=item %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

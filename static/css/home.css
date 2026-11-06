@@ -1,0 +1,316 @@
+/* ==========================================================================
+   MOODFLIX - HOMEPAGE STYLESHEET
+   Hero Section, Mood Grid, Movie Carousels & Rows
+   ========================================================================== */
+
+/* ================= Hero Section ================= */
+.hero-section {
+  position: relative;
+  min-height: 75vh;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--spacing-3xl) 0;
+  margin-bottom: var(--spacing-2xl);
+  overflow: hidden;
+}
+
+.hero-backdrop-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-backdrop-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  transform: scale(1.02);
+  transition: transform 10s ease-out;
+}
+
+.hero-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(11, 11, 16, 0.4) 0%, rgba(11, 11, 16, 0.85) 75%, var(--bg-primary) 100%),
+    linear-gradient(90deg, var(--bg-primary) 0%, rgba(11, 11, 16, 0.8) 45%, rgba(11, 11, 16, 0.2) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.hero-badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #C4B5FD;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.hero-title {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #FFFFFF;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+}
+
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+
+.hero-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.hero-overview {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #D4D4D8;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+/* ================= Mood Discovery Section ================= */
+.mood-section {
+  padding: var(--spacing-2xl) 0;
+  margin-bottom: var(--spacing-2xl);
+  position: relative;
+}
+
+.mood-section-intro {
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto var(--spacing-2xl);
+}
+
+.mood-section-subtitle {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent-primary);
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs);
+}
+
+.mood-section-title {
+  font-size: clamp(1.8rem, 4vw, 2.75rem);
+  font-weight: 800;
+  margin-bottom: var(--spacing-sm);
+}
+
+.mood-section-desc {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+}
+
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.mood-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg) var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  z-index: 1;
+}
+
+.mood-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--mood-gradient, var(--accent-gradient));
+  opacity: 0.08;
+  transition: opacity var(--transition-normal);
+  z-index: -1;
+}
+
+.mood-card::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: var(--mood-gradient, var(--accent-gradient));
+  opacity: 0;
+  z-index: -2;
+  transition: opacity var(--transition-normal);
+}
+
+.mood-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 25px var(--mood-glow, rgba(139, 92, 246, 0.4));
+  border-color: transparent;
+}
+
+.mood-card:hover::before {
+  opacity: 0.22;
+}
+
+.mood-card:hover::after {
+  opacity: 0.8;
+}
+
+.mood-icon-wrapper {
+  width: 68px;
+  height: 68px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  margin-bottom: var(--spacing-md);
+  transition: transform var(--transition-normal);
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.05);
+}
+
+.mood-card:hover .mood-icon-wrapper {
+  transform: scale(1.15) rotate(5deg);
+}
+
+.mood-card-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.mood-card-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: var(--spacing-sm);
+}
+
+.mood-card-cta {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mood-color, var(--accent-primary));
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: auto;
+}
+
+/* ================= Content Carousels ================= */
+.content-row-section {
+  margin-bottom: var(--spacing-3xl);
+  position: relative;
+}
+
+.carousel-container {
+  position: relative;
+  width: 100%;
+}
+
+.carousel-track {
+  display: flex;
+  gap: var(--spacing-md);
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding: var(--spacing-sm) 0 var(--spacing-lg);
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-item {
+  flex: 0 0 200px;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+  .carousel-item {
+    flex: 0 0 220px;
+  }
+}
+
+.carousel-nav-btn {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: rgba(11, 11, 16, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all var(--transition-fast);
+  opacity: 0;
+}
+
+.carousel-container:hover .carousel-nav-btn {
+  opacity: 1;
+}
+
+.carousel-nav-btn:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}
+
+.carousel-nav-prev {
+  left: -20px;
+}
+
+.carousel-nav-next {
+  right: -20px;
+}
+

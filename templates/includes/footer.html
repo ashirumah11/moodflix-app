@@ -1,0 +1,58 @@
+{% load static %}
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="brand-logo">
+          <div class="brand-icon">🎬</div>
+          <span>Mood<span class="gradient-text">Flix</span></span>
+        </div>
+        <p style="font-size: 0.95rem; margin-top: 0.5rem;">
+          Find Your Mood. Discover Your Movie. Connecting your emotional headspace to cinema that resonates, thrills, and comforts.
+        </p>
+      </div>
+
+      <div class="footer-links-grid">
+        <div class="footer-col">
+          <span class="footer-col-title">Navigation</span>
+          <a href="{% url 'home' %}" class="footer-link">Home</a>
+          <a href="{% url 'recommendations:mood_selection' %}" class="footer-link">Explore by Mood</a>
+          <a href="{% url 'movies:discover' %}" class="footer-link">Discover Movies</a>
+          <a href="{% url 'movies:trending' %}" class="footer-link">Trending Today</a>
+          <a href="{% url 'movies:search' %}" class="footer-link">Search Catalog</a>
+        </div>
+
+        <div class="footer-col">
+          <span class="footer-col-title">Moods</span>
+          {% for m in global_moods %}
+          <a href="{% url 'recommendations:mood_results' mood_slug=m.slug %}" class="footer-link">
+            {{ m.emoji }} {{ m.name }}
+          </a>
+          {% endfor %}
+        </div>
+
+        <div class="footer-col">
+          <span class="footer-col-title">Account</span>
+          {% if user.is_authenticated %}
+          <a href="{% url 'accounts:profile' %}" class="footer-link">Profile & Preferences</a>
+          <a href="{% url 'watchlist:index' %}" class="footer-link">My Watchlist</a>
+          <a href="{% url 'accounts:password_change' %}" class="footer-link">Security</a>
+          {% else %}
+          <a href="{% url 'accounts:login' %}" class="footer-link">Sign In</a>
+          <a href="{% url 'accounts:register' %}" class="footer-link">Create Account</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>
+        &copy; {{ current_year }} <strong>MoodFlix</strong>. All rights reserved. Discovery platform designed for cinema enthusiasts.
+      </div>
+      <div class="tmdb-attribution">
+        Powered by The Movie Database (TMDB) API. MoodFlix is an independent discovery platform and is not endorsed or certified by TMDB.
+      </div>
+    </div>
+  </div>
+</footer>
+

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 750" width="100%" height="100%">
+  <defs>
+    <linearGradient id="posterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#15151F"/>
+      <stop offset="50%" stop-color="#1D1D2A"/>
+      <stop offset="100%" stop-color="#0B0B10"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#posterGrad)"/>
+  <circle cx="250" cy="320" r="70" fill="none" stroke="url(#accentGrad)" stroke-width="4" opacity="0.8"/>
+  <path d="M235 290 L280 320 L235 350 Z" fill="url(#accentGrad)"/>
+  <text x="250" y="440" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">MOODFLIX</text>
+  <text x="250" y="480" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" fill="#A1A1AA" text-anchor="middle">Find Your Mood. Discover Your Movie.</text>
+</svg>
+

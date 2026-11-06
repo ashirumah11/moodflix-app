@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Profile — MoodFlix{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: var(--spacing-2xl); padding-bottom: var(--spacing-3xl);">
+  <!-- Profile Header Card -->
+  <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--spacing-2xl); margin-bottom: var(--spacing-2xl); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-lg);">
+    <div style="display: flex; align-items: center; gap: var(--spacing-lg);">
+      <div style="width: 76px; height: 76px; border-radius: var(--radius-full); background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #fff; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);">
+        {{ user.username|slice:":1"|upper }}
+      </div>
+      <div>
+        <h1 style="font-size: 1.8rem; margin-bottom: 0.2rem;">{{ user.username }}</h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+          {{ user.email }} &bull; Joined {{ user.date_joined|date:"F Y" }}
+        </p>
+        {% if profile.bio %}
+        <p style="margin-top: 0.5rem; color: #D4D4D8; max-width: 600px; font-size: 0.925rem;">
+          {{ profile.bio }}
+        </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div style="display: flex; gap: var(--spacing-sm);">
+      <a href="{% url 'accounts:profile_update' %}" class="btn btn-secondary">
+        ✏️ Edit Preferences
+      </a>
+      <a href="{% url 'accounts:password_change' %}" class="btn btn-ghost">
+        🔒 Change Password
+      </a>
+    </div>
+  </div>
+
+  <!-- Watchlist & Viewing Stats Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md); margin-bottom: var(--spacing-2xl);">
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--spacing-lg); text-align: center;">
+      <span style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Saved Titles</span>
+      <div style="font-size: 2rem; font-weight: 800; color: #fff; margin: 0.25rem 0;">{{ total_saved }}</div>
+      <a href="{% url 'watchlist:index' %}" style="font-size: 0.8rem; color: var(--accent-primary);">View All &rarr;</a>
+    </div>
+
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--spacing-lg); text-align: center;">
+      <span style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Watched Content</span>
+      <div style="font-size: 2rem; font-weight: 800; color: #34D399; margin: 0.25rem 0;">{{ watched_count }}</div>
+      <a href="{% url 'watchlist:index' %}?status=watched" style="font-size: 0.8rem; color: #34D399;">View Completed &rarr;</a>
+    </div>
+
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--spacing-lg); text-align: center;">
+      <span style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Up Next (Unwatched)</span>
+      <div style="font-size: 2rem; font-weight: 800; color: #FBBF24; margin: 0.25rem 0;">{{ unwatched_count }}</div>
+      <a href="{% url 'watchlist:index' %}?status=unwatched" style="font-size: 0.8rem; color: #FBBF24;">View Queue &rarr;</a>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl);">
+    <!-- Preferred Moods & Genres -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--spacing-xl);">
+      <h2 style="font-size: 1.25rem; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 0.5rem;">
+        <span>🎭</span>
+        <span>Entertainment Preferences</span>
+      </h2>
+
+      <div style="margin-bottom: var(--spacing-lg);">
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.4rem;">
+          Preferred Moods
+        </span>
+        {% if preferred_moods_list %}
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          {% for m in preferred_moods_list %}
+          <a href="{% url 'recommendations:mood_results' mood_slug=m %}" class="mood-switch-chip active" style="font-size: 0.85rem;">
+            {{ m|capfirst }}
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p style="font-size: 0.9rem; color: var(--text-muted);">
+          No preferred moods selected yet. <a href="{% url 'accounts:profile_update' %}" style="color: var(--accent-primary);">Customize preferences &rarr;</a>
+        </p>
+        {% endif %}
+      </div>
+
+      <div>
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.4rem;">
+          Preferred Genres
+        </span>
+        {% if profile.preferred_genres %}
+        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+          {% for g in profile.get_preferred_genres_list %}
+          <span class="genre-pill">{{ g }}</span>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p style="font-size: 0.9rem; color: var(--text-muted);">
+          No preferred genres specified. <a href="{% url 'accounts:profile_update' %}" style="color: var(--accent-primary);">Set favorite genres &rarr;</a>
+        </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Mood Selection History -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--spacing-xl);">
+      <h2 style="font-size: 1.25rem; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 0.5rem;">
+        <span>🕒</span>
+        <span>Recent Mood History</span>
+      </h2>
+
+      {% if recent_moods %}
+      <div style="display: flex; flex-direction: column; gap: var(--spacing-sm);">
+        {% for entry in recent_moods %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.8rem; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <a href="{% url 'recommendations:mood_results' mood_slug=entry.selected_mood %}" style="font-weight: 600; color: #fff;">
+            Feeling {{ entry.selected_mood|capfirst }}
+          </a>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">
+            {{ entry.selected_at|date:"M j, Y — H:i" }}
+          </span>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p style="font-size: 0.9rem; color: var(--text-muted);">
+        You haven't made any mood discovery selections yet. Discover your first title today!
+      </p>
+      <a href="{% url 'recommendations:mood_selection' %}" class="btn btn-primary btn-sm" style="margin-top: var(--spacing-md);">
+        Explore by Mood
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

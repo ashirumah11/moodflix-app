@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ mood.name }} Movies & Shows — MoodFlix Recommendations{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: var(--spacing-2xl); padding-bottom: var(--spacing-3xl);">
+  <!-- Mood Results Hero Banner -->
+  <div class="mood-results-banner" style="--banner-gradient: {{ mood.gradient }};">
+    <div class="mood-results-banner-inner">
+      <div class="mood-results-left">
+        <div class="mood-badge-large">{{ mood.emoji }}</div>
+        <div>
+          <span style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: {{ mood.color }};">
+            Mood Recommendation
+          </span>
+          <h1 style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin: 0.2rem 0;">
+            Feeling {{ mood.name }}
+          </h1>
+          <p style="font-size: 1.1rem; color: #E4E4E7; max-width: 600px;">
+            {{ mood.tagline }} &mdash; {{ mood.description }}
+          </p>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: var(--spacing-sm); align-items: center;">
+        <a href="?refresh=1{% if selected_genre %}&genre={{ selected_genre }}{% endif %}&sort={{ sort_by }}" class="btn btn-secondary" title="Re-shuffle recommendations">
+          <span>🔄 Refresh Matches</span>
+        </a>
+        <a href="{% url 'recommendations:mood_selection' %}" class="btn btn-ghost" title="Pick a different mood">
+          <span>Change Mood</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Quick Mood Switch Bar -->
+    <div style="margin-top: var(--spacing-lg); border-top: 1px solid var(--border-color); padding-top: var(--spacing-md);">
+      <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.4rem;">
+        Switch Emotional Vibe:
+      </span>
+      <div class="mood-switch-bar">
+        {% for m in all_moods %}
+        <a
+          href="{% url 'recommendations:mood_results' mood_slug=m.slug %}"
+          class="mood-switch-chip {% if m.slug == mood.slug %}active{% endif %}"
+        >
+          <span>{{ m.emoji }}</span>
+          <span>{{ m.name }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter & Sort Toolbar -->
+  <div class="filter-card">
+    <form method="get" class="filter-form">
+      <!-- Genre sub-filter -->
+      <div class="filter-item">
+        <label for="genreFilter">Filter Genre</label>
+        <select name="genre" id="genreFilter" class="filter-select" onchange="this.form.submit()">
+          <option value="">All {{ mood.name }} Themes</option>
+          {% for g in available_genres %}
+          <option value="{{ g.id }}" {% if selected_genre == g.id %}selected{% endif %}>
+            {{ g.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Sort Options -->
+      <div class="filter-item">
+        <label for="sortFilter">Sort Order</label>
+        <select name="sort" id="sortFilter" class="filter-select" onchange="this.form.submit()">
+          <option value="relevance" {% if sort_by == 'relevance' %}selected{% endif %}>Best Mood Match (Relevance)</option>
+          <option value="popularity.desc" {% if sort_by == 'popularity.desc' %}selected{% endif %}>Most Popular First</option>
+          <option value="vote_average.desc" {% if sort_by == 'vote_average.desc' %}selected{% endif %}>Highest Rated First</option>
+        </select>
+      </div>
+
+      <noscript>
+        <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+      </noscript>
+    </form>
+  </div>
+
+  <!-- Recommendations Grid -->
+  {% if recommendations %}
+  <div class="movies-grid">
+    {% for item in recommendations %}
+      {% include 'includes/movie_card.html' with item=item %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🎭</div>
+    <h2 class="empty-title">No direct matches found</h2>
+    <p class="empty-desc">
+      Try clearing the specific genre sub-filter or refreshing to fetch another set of recommended titles.
+    </p>
+    <a href="{% url 'recommendations:mood_results' mood_slug=mood.slug %}" class="btn btn-primary">
+      Clear Sub-Filters
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+

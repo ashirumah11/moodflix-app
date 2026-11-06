@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ tv.title }} (TV Series) — MoodFlix{% endblock %}
+
+{% block content %}
+<!-- Cinematic Backdrop Hero -->
+<section class="detail-hero">
+  <div class="detail-backdrop-wrapper">
+    <img
+      src="{{ tv.backdrop_url }}"
+      alt="{{ tv.title }} Backdrop"
+      class="detail-backdrop-img"
+      onerror="this.onerror=null;this.src='{% static 'images/fallback_backdrop.svg' %}';"
+    />
+    <div class="detail-gradient-overlay"></div>
+  </div>
+
+  <div class="container detail-content-grid">
+    <!-- TV Poster -->
+    <div class="detail-poster-wrapper">
+      <img
+        src="{{ tv.poster_url }}"
+        alt="{{ tv.title }} Poster"
+        class="detail-poster-img"
+        onerror="this.onerror=null;this.src='{% static 'images/fallback_poster.svg' %}';"
+      />
+    </div>
+
+    <!-- TV Information -->
+    <div class="detail-info">
+      <div>
+        <div class="media-badge" style="margin-bottom: 0.5rem; display: inline-block;">Television Series</div>
+        <h1 class="detail-title">{{ tv.title }}</h1>
+        {% if tv.tagline %}
+        <p class="detail-tagline">"{{ tv.tagline }}"</p>
+        {% endif %}
+      </div>
+
+      <div class="detail-meta-row">
+        {% if tv.vote_average %}
+        <span class="rating-badge" style="font-size: 0.95rem; padding: 0.35rem 0.75rem;">
+          ★ {{ tv.vote_average }} / 10
+        </span>
+        {% endif %}
+
+        {% if tv.release_date %}
+        <span>Premiere: {{ tv.release_date }}</span>
+        {% endif %}
+
+        {% if tv.number_of_seasons %}
+        <span>{{ tv.number_of_seasons }} Season{{ tv.number_of_seasons|pluralize }}</span>
+        {% endif %}
+
+        {% if tv.number_of_episodes %}
+        <span>{{ tv.number_of_episodes }} Episodes</span>
+        {% endif %}
+      </div>
+
+      {% if tv.genres %}
+      <div class="genre-tags">
+        {% for g in tv.genres %}
+        <span class="genre-pill">{{ g }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="detail-synopsis-box">
+        <h3>Overview</h3>
+        <p class="detail-synopsis">{{ tv.overview }}</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="detail-actions-row">
+        <form action="{% url 'watchlist:toggle' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="tmdb_id" value="{{ tv.id }}">
+          <input type="hidden" name="media_type" value="tv">
+          <input type="hidden" name="title" value="{{ tv.title }}">
+          <input type="hidden" name="poster_path" value="{{ tv.poster_path|default:'' }}">
+          <input type="hidden" name="backdrop_path" value="{{ tv.backdrop_path|default:'' }}">
+          <input type="hidden" name="vote_average" value="{{ tv.vote_average|default:'0' }}">
+          <input type="hidden" name="release_date" value="{{ tv.release_date|default:'' }}">
+
+          <button
+            type="submit"
+            class="btn {% if in_watchlist %}btn-secondary{% else %}btn-primary{% endif %} btn-lg watchlist-ajax-btn {% if in_watchlist %}active{% endif %}"
+            data-tmdb-id="{{ tv.id }}"
+            data-media-type="tv"
+            data-title="{{ tv.title }}"
+            data-poster-path="{{ tv.poster_path|default:'' }}"
+            data-backdrop-path="{{ tv.backdrop_path|default:'' }}"
+            data-vote-average="{{ tv.vote_average|default:'0' }}"
+            data-release-date="{{ tv.release_date|default:'' }}"
+            data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}"
+          >
+            <span class="icon">{% if in_watchlist %}✓ Saved in Watchlist{% else %}+ Add to Watchlist{% endif %}</span>
+          </button>
+        </form>
+
+        <button class="btn btn-secondary btn-lg open-trailer-btn" data-trailer-id="{{ tv.id }}" data-media-type="tv" data-title="{{ tv.title }}" {% if tv.trailer_key %}data-trailer-key="{{ tv.trailer_key }}"{% endif %}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Watch Trailer</span>
+        </button>
+
+        <a href="{% url 'recommendations:mood_selection' %}" class="btn btn-ghost btn-lg">
+          ✨ Match by Mood
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container" style="padding-bottom: var(--spacing-3xl);">
+  <!-- Trailer Embed Section -->
+  {% if tv.trailer_key %}
+  <section class="trailer-section">
+    <div class="section-header">
+      <h2 class="section-title">Official Video Trailer</h2>
+    </div>
+    <div class="video-container">
+      <iframe
+        src="https://www.youtube.com/embed/{{ tv.trailer_key }}?rel=0"
+        title="{{ tv.title }} Trailer"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Top Cast -->
+  {% if tv.cast %}
+  <section style="margin-bottom: var(--spacing-3xl);">
+    <div class="section-header">
+      <h2 class="section-title">Series Cast</h2>
+    </div>
+    <div class="cast-grid">
+      {% for actor in tv.cast %}
+      <div class="cast-card">
+        {% if actor.profile_url %}
+        <img src="{{ actor.profile_url }}" alt="{{ actor.name }}" class="cast-photo" loading="lazy" />
+        {% else %}
+        <div class="cast-photo" style="display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--text-muted);">
+          👤
+        </div>
+        {% endif %}
+        <div class="cast-name">{{ actor.name }}</div>
+        <div class="cast-role">{{ actor.character }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Similar TV Shows -->
+  {% if tv.similar %}
+  <section>
+    <div class="section-header">
+      <h2 class="section-title">Similar Television Series</h2>
+    </div>
+    <div class="movies-grid">
+      {% for item in tv.similar %}
+        {% include 'includes/movie_card.html' with item=item %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

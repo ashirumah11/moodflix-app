@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MoodFlix — Find Your Mood. Discover Your Movie.{% endblock %}
+
+{% block content %}
+<!-- ================= 1. Cinematic Hero Section ================= -->
+{% if hero_movie %}
+<section class="hero-section">
+  <div class="hero-backdrop-wrapper">
+    <img
+      src="{{ hero_movie.backdrop_url }}"
+      alt="{{ hero_movie.title }} Backdrop"
+      class="hero-backdrop-img"
+      onerror="this.onerror=null;this.src='{% static 'images/fallback_backdrop.svg' %}';"
+    />
+    <div class="hero-gradient-overlay"></div>
+  </div>
+
+  <div class="container hero-content">
+    <div class="hero-badge-tag">
+      ★ Featured Spotlight
+    </div>
+
+    <h1 class="hero-title">{{ hero_movie.title }}</h1>
+
+    <div class="hero-meta">
+      {% if hero_movie.vote_average %}
+      <span class="rating-badge">★ {{ hero_movie.vote_average }} TMDB</span>
+      {% endif %}
+
+      {% if hero_movie.release_year %}
+      <span class="hero-meta-item">{{ hero_movie.release_year }}</span>
+      {% endif %}
+
+      {% if hero_movie.genres %}
+      <span class="hero-meta-item">&bull; {{ hero_movie.genres|slice:":3"|join:", " }}</span>
+      {% endif %}
+    </div>
+
+    <p class="hero-overview">
+      {{ hero_movie.overview|truncatewords:45 }}
+    </p>
+
+    <div class="hero-actions">
+      <!-- Detail link -->
+      <a href="{% if hero_movie.media_type == 'tv' %}{% url 'movies:tv_detail' tmdb_id=hero_movie.id %}{% else %}{% url 'movies:movie_detail' tmdb_id=hero_movie.id %}{% endif %}" class="btn btn-primary btn-lg">
+        <span>Explore Details</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+
+      <!-- Watch trailer trigger (supports preloaded or on-demand fetch) -->
+      <button
+        type="button"
+        class="btn btn-secondary btn-lg open-trailer-btn"
+        data-trailer-id="{{ hero_movie.id }}"
+        data-media-type="{{ hero_movie.media_type|default:'movie' }}"
+        data-title="{{ hero_movie.title }}"
+        {% if hero_movie.trailer_key %}data-trailer-key="{{ hero_movie.trailer_key }}"{% endif %}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Watch Trailer</span>
+      </button>
+
+      <!-- Hero Watchlist Toggle -->
+      <form action="{% url 'watchlist:toggle' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="tmdb_id" value="{{ hero_movie.id }}">
+        <input type="hidden" name="media_type" value="{{ hero_movie.media_type|default:'movie' }}">
+        <input type="hidden" name="title" value="{{ hero_movie.title }}">
+        <input type="hidden" name="poster_path" value="{{ hero_movie.poster_path|default:'' }}">
+        <input type="hidden" name="backdrop_path" value="{{ hero_movie.backdrop_path|default:'' }}">
+        <input type="hidden" name="vote_average" value="{{ hero_movie.vote_average|default:'0' }}">
+        <input type="hidden" name="release_date" value="{{ hero_movie.release_date|default:'' }}">
+
+        <button
+          type="submit"
+          class="btn btn-secondary btn-lg watchlist-ajax-btn {% if hero_movie.in_watchlist %}active{% endif %}"
+          data-tmdb-id="{{ hero_movie.id }}"
+          data-media-type="{{ hero_movie.media_type|default:'movie' }}"
+          data-title="{{ hero_movie.title }}"
+          data-poster-path="{{ hero_movie.poster_path|default:'' }}"
+          data-backdrop-path="{{ hero_movie.backdrop_path|default:'' }}"
+          data-vote-average="{{ hero_movie.vote_average|default:'0' }}"
+          data-release-date="{{ hero_movie.release_date|default:'' }}"
+          data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}"
+          title="{% if hero_movie.in_watchlist %}Remove from Watchlist{% else %}Add to Watchlist{% endif %}"
+        >
+          <span class="icon">{% if hero_movie.in_watchlist %}✓ In Watchlist{% else %}+ Watchlist{% endif %}</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<div class="container">
+  <!-- ================= 2. Mood Selection Section ================= -->
+  <section class="mood-section" id="moodSection">
+    <div class="mood-section-intro">
+      <div class="mood-section-subtitle">Emotional Discovery</div>
+      <h2 class="mood-section-title">How are you feeling today?</h2>
+      <p class="mood-section-desc">
+        Select your current emotional wavelength and let our recommendation engine match you with the perfect film.
+      </p>
+    </div>
+
+    <div class="mood-grid">
+      {% for m in global_moods %}
+      <a
+        href="{% url 'recommendations:mood_results' mood_slug=m.slug %}"
+        class="mood-card"
+        style="--mood-color: {{ m.color }}; --mood-gradient: {{ m.gradient }}; --mood-glow: {{ m.color }}55;"
+        data-mood="{{ m.slug }}"
+      >
+        <div class="mood-icon-wrapper">{{ m.emoji }}</div>
+        <div class="mood-card-title">{{ m.name }}</div>
+        <div class="mood-card-desc">{{ m.description }}</div>
+        <div class="mood-card-cta">
+          <span>Discover Movies</span>
+          <span>&rarr;</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ================= 3. Trending Movies Carousel ================= -->
+  <section class="content-row-section">
+    <div class="section-header">
+      <h2 class="section-title">🔥 Trending Movies</h2>
+      <a href="{% url 'movies:trending' %}?window=day" class="section-link">
+        <span>View All</span>
+        <span>&rarr;</span>
+      </a>
+    </div>
+
+    <div class="carousel-container">
+      <button class="carousel-nav-btn carousel-nav-prev" aria-label="Scroll left">&#8249;</button>
+      <div class="carousel-track">
+        {% for item in trending_movies %}
+        <div class="carousel-item">
+          {% include 'includes/movie_card.html' with item=item %}
+        </div>
+        {% endfor %}
+      </div>
+      <button class="carousel-nav-btn carousel-nav-next" aria-label="Scroll right">&#8250;</button>
+    </div>
+  </section>
+
+  <!-- ================= 4. Now Playing in Theaters ================= -->
+  {% if now_playing_movies %}
+  <section class="content-row-section">
+    <div class="section-header">
+      <h2 class="section-title">🎬 Now Playing in Theaters</h2>
+      <a href="{% url 'movies:discover' %}?sort=now_playing" class="section-link">
+        <span>View All</span>
+        <span>&rarr;</span>
+      </a>
+    </div>
+
+    <div class="carousel-container">
+      <button class="carousel-nav-btn carousel-nav-prev" aria-label="Scroll left">&#8249;</button>
+      <div class="carousel-track">
+        {% for item in now_playing_movies %}
+        <div class="carousel-item">
+          {% include 'includes/movie_card.html' with item=item %}
+        </div>
+        {% endfor %}
+      </div>
+      <button class="carousel-nav-btn carousel-nav-next" aria-label="Scroll right">&#8250;</button>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ================= 5. Popular Movies Carousel ================= -->
+  <section class="content-row-section">
+    <div class="section-header">
+      <h2 class="section-title">⭐ Popular Across Cinema</h2>
+      <a href="{% url 'movies:discover' %}?sort=popularity.desc" class="section-link">
+        <span>View All</span>
+        <span>&rarr;</span>
+      </a>
+    </div>
+
+    <div class="carousel-container">
+      <button class="carousel-nav-btn carousel-nav-prev" aria-label="Scroll left">&#8249;</button>
+      <div class="carousel-track">
+        {% for item in popular_movies %}
+        <div class="carousel-item">
+          {% include 'includes/movie_card.html' with item=item %}
+        </div>
+        {% endfor %}
+      </div>
+      <button class="carousel-nav-btn carousel-nav-next" aria-label="Scroll right">&#8250;</button>
+    </div>
+  </section>
+
+  <!-- ================= 6. Top Rated Movies Carousel ================= -->
+  <section class="content-row-section">
+    <div class="section-header">
+      <h2 class="section-title">🏆 All-Time Top Rated</h2>
+      <a href="{% url 'movies:discover' %}?sort=vote_average.desc" class="section-link">
+        <span>View All</span>
+        <span>&rarr;</span>
+      </a>
+    </div>
+
+    <div class="carousel-container">
+      <button class="carousel-nav-btn carousel-nav-prev" aria-label="Scroll left">&#8249;</button>
+      <div class="carousel-track">
+        {% for item in top_rated_movies %}
+        <div class="carousel-item">
+          {% include 'includes/movie_card.html' with item=item %}
+        </div>
+        {% endfor %}
+      </div>
+      <button class="carousel-nav-btn carousel-nav-next" aria-label="Scroll right">&#8250;</button>
+    </div>
+  </section>
+
+  <!-- ================= 7. Upcoming Releases ================= -->
+  {% if upcoming_movies %}
+  <section class="content-row-section">
+    <div class="section-header">
+      <h2 class="section-title">🚀 Upcoming Releases</h2>
+      <a href="{% url 'movies:discover' %}?sort=upcoming" class="section-link">
+        <span>View All</span>
+        <span>&rarr;</span>
+      </a>
+    </div>
+
+    <div class="carousel-container">
+      <button class="carousel-nav-btn carousel-nav-prev" aria-label="Scroll left">&#8249;</button>
+      <div class="carousel-track">
+        {% for item in upcoming_movies %}
+        <div class="carousel-item">
+          {% include 'includes/movie_card.html' with item=item %}
+        </div>
+        {% endfor %}
+      </div>
+      <button class="carousel-nav-btn carousel-nav-next" aria-label="Scroll right">&#8250;</button>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ================= 8. Popular TV Shows Carousel ================= -->
+  <section class="content-row-section">
+    <div class="section-header">
+      <h2 class="section-title">📺 Binge-Worthy TV Series</h2>
+      <a href="{% url 'movies:discover' %}?type=tv" class="section-link">
+        <span>View All</span>
+        <span>&rarr;</span>
+      </a>
+    </div>
+
+    <div class="carousel-container">
+      <button class="carousel-nav-btn carousel-nav-prev" aria-label="Scroll left">&#8249;</button>
+      <div class="carousel-track">
+        {% for item in popular_tv %}
+        <div class="carousel-item">
+          {% include 'includes/movie_card.html' with item=item %}
+        </div>
+        {% endfor %}
+      </div>
+      <button class="carousel-nav-btn carousel-nav-next" aria-label="Scroll right">&#8250;</button>
+    </div>
+  </section>
+</div>
+{% endblock %}

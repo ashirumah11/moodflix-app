@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ movie.title }} ({% if movie.release_year %}{{ movie.release_year }}{% endif %}) — MoodFlix{% endblock %}
+
+{% block content %}
+<!-- Cinematic Backdrop Hero -->
+<section class="detail-hero">
+  <div class="detail-backdrop-wrapper">
+    <img
+      src="{{ movie.backdrop_url }}"
+      alt="{{ movie.title }} Backdrop"
+      class="detail-backdrop-img"
+      onerror="this.onerror=null;this.src='{% static 'images/fallback_backdrop.svg' %}';"
+    />
+    <div class="detail-gradient-overlay"></div>
+  </div>
+
+  <div class="container detail-content-grid">
+    <!-- Movie Poster -->
+    <div class="detail-poster-wrapper">
+      <img
+        src="{{ movie.poster_url }}"
+        alt="{{ movie.title }} Poster"
+        class="detail-poster-img"
+        onerror="this.onerror=null;this.src='{% static 'images/fallback_poster.svg' %}';"
+      />
+    </div>
+
+    <!-- Movie Information -->
+    <div class="detail-info">
+      <div>
+        <h1 class="detail-title">{{ movie.title }}</h1>
+        {% if movie.tagline %}
+        <p class="detail-tagline">"{{ movie.tagline }}"</p>
+        {% endif %}
+      </div>
+
+      <div class="detail-meta-row">
+        {% if movie.vote_average %}
+        <span class="rating-badge" style="font-size: 0.95rem; padding: 0.35rem 0.75rem;">
+          ★ {{ movie.vote_average }} / 10
+        </span>
+        {% endif %}
+
+        {% if movie.release_date %}
+        <span>📅 {{ movie.release_date }}</span>
+        {% endif %}
+
+        {% if movie.runtime %}
+        <span>⏱️ {{ movie.runtime }} min</span>
+        {% endif %}
+
+        {% if movie.director %}
+        <span>🎬 Dir: <strong>{{ movie.director }}</strong></span>
+        {% endif %}
+      </div>
+
+      {% if movie.genres %}
+      <div class="genre-tags">
+        {% for g in movie.genres %}
+        <span class="genre-pill">{{ g }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="detail-synopsis-box">
+        <h3>Storyline</h3>
+        <p class="detail-synopsis">{{ movie.overview }}</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="detail-actions-row">
+        <!-- Watchlist Action -->
+        <form action="{% url 'watchlist:toggle' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="tmdb_id" value="{{ movie.id }}">
+          <input type="hidden" name="media_type" value="movie">
+          <input type="hidden" name="title" value="{{ movie.title }}">
+          <input type="hidden" name="poster_path" value="{{ movie.poster_path|default:'' }}">
+          <input type="hidden" name="backdrop_path" value="{{ movie.backdrop_path|default:'' }}">
+          <input type="hidden" name="vote_average" value="{{ movie.vote_average|default:'0' }}">
+          <input type="hidden" name="release_date" value="{{ movie.release_date|default:'' }}">
+
+          <button
+            type="submit"
+            class="btn {% if in_watchlist %}btn-secondary{% else %}btn-primary{% endif %} btn-lg watchlist-ajax-btn {% if in_watchlist %}active{% endif %}"
+            data-tmdb-id="{{ movie.id }}"
+            data-media-type="movie"
+            data-title="{{ movie.title }}"
+            data-poster-path="{{ movie.poster_path|default:'' }}"
+            data-backdrop-path="{{ movie.backdrop_path|default:'' }}"
+            data-vote-average="{{ movie.vote_average|default:'0' }}"
+            data-release-date="{{ movie.release_date|default:'' }}"
+            data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}"
+          >
+            <span class="icon">{% if in_watchlist %}✓ Saved in Watchlist{% else %}+ Add to Watchlist{% endif %}</span>
+          </button>
+        </form>
+
+        <button class="btn btn-secondary btn-lg open-trailer-btn" data-trailer-id="{{ movie.id }}" data-media-type="movie" data-title="{{ movie.title }}" {% if movie.trailer_key %}data-trailer-key="{{ movie.trailer_key }}"{% endif %}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Watch Trailer</span>
+        </button>
+
+        <a href="{% url 'recommendations:mood_selection' %}" class="btn btn-ghost btn-lg">
+          ✨ Match by Mood
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container" style="padding-bottom: var(--spacing-3xl);">
+  <!-- Trailer Embed Section -->
+  {% if movie.trailer_key %}
+  <section class="trailer-section">
+    <div class="section-header">
+      <h2 class="section-title">Official Video Trailer</h2>
+    </div>
+    <div class="video-container">
+      <iframe
+        src="https://www.youtube.com/embed/{{ movie.trailer_key }}?rel=0"
+        title="{{ movie.title }} Trailer"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Top Billed Cast -->
+  {% if movie.cast %}
+  <section style="margin-bottom: var(--spacing-3xl);">
+    <div class="section-header">
+      <h2 class="section-title">Top Billed Cast</h2>
+    </div>
+    <div class="cast-grid">
+      {% for actor in movie.cast %}
+      <div class="cast-card">
+        {% if actor.profile_url %}
+        <img src="{{ actor.profile_url }}" alt="{{ actor.name }}" class="cast-photo" loading="lazy" />
+        {% else %}
+        <div class="cast-photo" style="display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--text-muted);">
+          👤
+        </div>
+        {% endif %}
+        <div class="cast-name">{{ actor.name }}</div>
+        <div class="cast-role">{{ actor.character }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Similar Movies -->
+  {% if movie.similar %}
+  <section>
+    <div class="section-header">
+      <h2 class="section-title">Similar Movies You May Love</h2>
+    </div>
+    <div class="movies-grid">
+      {% for item in movie.similar %}
+        {% include 'includes/movie_card.html' with item=item %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

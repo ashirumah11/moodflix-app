@@ -1,0 +1,473 @@
+/* ==========================================================================
+   MOODFLIX - MOVIES, DISCOVERY, SEARCH & DETAILS STYLESHEET
+   ========================================================================== */
+
+/* ================= Detail Page (Movie & TV) ================= */
+.detail-hero {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--spacing-3xl) 0 var(--spacing-2xl);
+  margin-bottom: var(--spacing-2xl);
+  overflow: hidden;
+}
+
+.detail-backdrop-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.detail-backdrop-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  opacity: 0.45;
+  filter: blur(2px);
+  transform: scale(1.05);
+}
+
+.detail-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(11, 11, 16, 0.2) 0%, rgba(11, 11, 16, 0.9) 80%, var(--bg-primary) 100%),
+    linear-gradient(90deg, var(--bg-primary) 0%, rgba(11, 11, 16, 0.8) 50%, rgba(11, 11, 16, 0.4) 100%);
+}
+
+.detail-content-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--spacing-2xl);
+  align-items: flex-end;
+}
+
+.detail-poster-wrapper {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 25px rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--bg-card);
+}
+
+.detail-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.detail-title {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.detail-tagline {
+  font-size: 1.1rem;
+  font-style: italic;
+  color: #C4B5FD;
+}
+
+.detail-meta-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.genre-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.genre-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+}
+
+.detail-synopsis-box {
+  margin-top: var(--spacing-xs);
+}
+
+.detail-synopsis-box h3 {
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-primary);
+}
+
+.detail-synopsis {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #D4D4D8;
+  max-width: 800px;
+}
+
+.detail-actions-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+/* Trailer Section */
+.trailer-section {
+  margin: var(--spacing-3xl) 0;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg), 0 0 30px rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--border-color);
+  background: #000;
+  margin: 0 auto;
+}
+
+.video-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Cast Grid */
+.cast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.cast-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  text-align: center;
+  padding-bottom: var(--spacing-sm);
+}
+
+.cast-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: var(--bg-secondary);
+}
+
+.cast-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: var(--spacing-xs);
+  padding: 0 0.5rem;
+}
+
+.cast-role {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 0 0.5rem;
+}
+
+/* ================= Filter & Discovery Bar ================= */
+.filter-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1 1 180px;
+}
+
+.filter-item label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filter-select {
+  padding: 0.65rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  border-color: var(--accent-primary);
+  outline: none;
+}
+
+/* ================= Movies & TV Grid ================= */
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--spacing-lg) var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .movies-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+/* ================= Search Bar ================= */
+.search-hero {
+  padding: var(--spacing-2xl) 0 var(--spacing-xl);
+  text-align: center;
+}
+
+.search-input-wrapper {
+  position: relative;
+  max-width: 650px;
+  margin: var(--spacing-lg) auto;
+}
+
+.search-input-large {
+  width: 100%;
+  padding: 1.1rem 3.5rem 1.1rem 3.2rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: all var(--transition-normal);
+}
+
+.search-input-large:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.3), var(--shadow-lg);
+}
+
+.search-icon-left {
+  position: absolute;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  pointer-events: none;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: none;
+}
+
+.search-clear-btn.visible {
+  display: block;
+}
+
+/* Live Search Suggestions Dropdown */
+.live-search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), 0 10px 30px rgba(0, 0, 0, 0.8);
+  max-height: 420px;
+  overflow-y: auto;
+  z-index: 100;
+  display: none;
+  text-align: left;
+}
+
+.live-search-dropdown.open {
+  display: block;
+}
+
+.live-search-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: 0.75rem var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: background var(--transition-fast);
+}
+
+.live-search-item:last-child {
+  border-bottom: none;
+}
+
+.live-search-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.live-search-thumb {
+  width: 42px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.live-search-title {
+  font-weight: 600;
+  font-size: 0.925rem;
+}
+
+.live-search-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ================= Mood Results Header ================= */
+.mood-results-banner {
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.mood-results-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--banner-gradient, var(--accent-gradient));
+  opacity: 0.15;
+}
+
+.mood-results-banner-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+}
+
+.mood-results-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.mood-badge-large {
+  font-size: 3.5rem;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-md);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.mood-switch-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: var(--spacing-md);
+}
+
+.mood-switch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.mood-switch-chip:hover, .mood-switch-chip.active {
+  background: var(--accent-gradient);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+}
+
+/* Pagination */
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-3xl);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.page-btn {
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.page-btn:hover:not(.disabled) {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+.page-btn.active {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: #fff;
+}
+
+.page-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+

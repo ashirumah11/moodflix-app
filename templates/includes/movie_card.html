@@ -1,0 +1,99 @@
+{% load static %}
+<div class="movie-card" data-card-id="{{ item.id }}">
+  <div class="card-poster-wrapper">
+    <a href="{% if item.media_type == 'tv' %}{% url 'movies:tv_detail' tmdb_id=item.id %}{% else %}{% url 'movies:movie_detail' tmdb_id=item.id %}{% endif %}" aria-label="View details for {{ item.title }}">
+      <img
+        src="{{ item.poster_url }}"
+        alt="{{ item.title }} Poster"
+        class="card-poster"
+        loading="lazy"
+        onerror="this.onerror=null;this.src='{% static 'images/fallback_poster.svg' %}';"
+      />
+    </a>
+
+    <div class="card-overlay">
+      <div class="card-top-badges">
+        {% if item.vote_average %}
+        <span class="rating-badge" title="TMDB Rating">
+          ★ {{ item.vote_average }}
+        </span>
+        {% else %}
+        <span></span>
+        {% endif %}
+
+        {% if item.media_type == 'tv' %}
+        <span class="media-badge">TV</span>
+        {% endif %}
+      </div>
+
+      <div class="card-actions">
+        <!-- Watch Trailer Button -->
+        <button
+          type="button"
+          class="trailer-card-btn open-trailer-btn"
+          data-trailer-id="{{ item.id }}"
+          data-media-type="{{ item.media_type|default:'movie' }}"
+          {% if item.trailer_key %}data-trailer-key="{{ item.trailer_key }}"{% endif %}
+          data-title="{{ item.title }}"
+          title="Watch Trailer"
+          aria-label="Watch trailer for {{ item.title }}"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </button>
+
+        <!-- Watchlist Button (Works with both AJAX & standard Form POST) -->
+        <form action="{% url 'watchlist:toggle' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="tmdb_id" value="{{ item.id }}">
+          <input type="hidden" name="media_type" value="{{ item.media_type|default:'movie' }}">
+          <input type="hidden" name="title" value="{{ item.title }}">
+          <input type="hidden" name="poster_path" value="{{ item.poster_path|default:'' }}">
+          <input type="hidden" name="backdrop_path" value="{{ item.backdrop_path|default:'' }}">
+          <input type="hidden" name="vote_average" value="{{ item.vote_average|default:'0' }}">
+          <input type="hidden" name="release_date" value="{{ item.release_date|default:'' }}">
+
+          <button
+            type="submit"
+            class="watchlist-btn watchlist-ajax-btn {% if item.in_watchlist %}active{% endif %}"
+            data-tmdb-id="{{ item.id }}"
+            data-media-type="{{ item.media_type|default:'movie' }}"
+            data-title="{{ item.title }}"
+            data-poster-path="{{ item.poster_path|default:'' }}"
+            data-backdrop-path="{{ item.backdrop_path|default:'' }}"
+            data-vote-average="{{ item.vote_average|default:'0' }}"
+            data-release-date="{{ item.release_date|default:'' }}"
+            data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}"
+            title="{% if item.in_watchlist %}Remove from Watchlist{% else %}Add to Watchlist{% endif %}"
+            aria-label="Toggle watchlist for {{ item.title }}"
+          >
+            <span class="icon">{% if item.in_watchlist %}✓{% else %}+{% endif %}</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-info">
+    <a href="{% if item.media_type == 'tv' %}{% url 'movies:tv_detail' tmdb_id=item.id %}{% else %}{% url 'movies:movie_detail' tmdb_id=item.id %}{% endif %}" class="card-title" title="{{ item.title }}">
+      {{ item.title }}
+    </a>
+
+    <div class="card-meta">
+      {% if item.release_year %}
+      <span>{{ item.release_year }}</span>
+      {% endif %}
+
+      {% if item.relevance_score %}
+      <span style="color: var(--accent-secondary); font-weight: 700; font-size: 0.75rem;">
+        {{ item.relevance_score|floatformat:0 }}% Mood Match
+      </span>
+      {% endif %}
+    </div>
+
+    {% if item.genres %}
+    <div class="card-genres">
+      {{ item.genres|slice:":2"|join:", " }}
+    </div>
+    {% endif %}
+  </div>
+</div>

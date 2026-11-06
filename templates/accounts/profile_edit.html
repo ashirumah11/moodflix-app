@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile & Preferences — MoodFlix{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: var(--spacing-2xl); padding-bottom: var(--spacing-3xl); max-width: 700px;">
+  <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--spacing-2xl); box-shadow: var(--shadow-lg);">
+    <div style="margin-bottom: var(--spacing-xl);">
+      <h1 style="font-size: 1.8rem; margin-bottom: 0.25rem;">Update Preferences</h1>
+      <p style="font-size: 0.95rem; color: var(--text-secondary);">
+        Fine-tune your personal information and cinema preferences to improve recommendation relevance.
+      </p>
+    </div>
+
+    <form method="post" action="{% url 'accounts:profile_update' %}">
+      {% csrf_token %}
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+        <div class="form-group">
+          <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+          {{ form.first_name }}
+        </div>
+        <div class="form-group">
+          <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+          {{ form.last_name }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.email.id_for_label }}" class="form-label">Email Address</label>
+        {{ form.email }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.bio.id_for_label }}" class="form-label">Bio</label>
+        {{ form.bio }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.preferred_genres.id_for_label }}" class="form-label">Favorite Genres (Comma separated)</label>
+        {{ form.preferred_genres }}
+        <span style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">
+          e.g. Science Fiction, Comedy, Drama, Animation
+        </span>
+      </div>
+
+      <div class="form-group" style="margin-top: var(--spacing-lg);">
+        <label class="form-label" style="margin-bottom: var(--spacing-sm);">Preferred Moods</label>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.6rem; background: var(--bg-secondary); padding: var(--spacing-md); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          {% for checkbox in form.preferred_moods_select %}
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-primary); cursor: pointer;">
+            {{ checkbox.tag }}
+            <span>{{ checkbox.choice_label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-xl);">
+        <button type="submit" class="btn btn-primary" style="padding: 0.8rem 1.8rem;">
+          Save Changes
+        </button>
+        <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Explore by Mood — MoodFlix{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: var(--spacing-2xl); padding-bottom: var(--spacing-3xl);">
+  <div class="mood-section-intro">
+    <div class="mood-section-subtitle">Intelligent Recommendation Engine</div>
+    <h1 class="mood-section-title">Select Your Emotional State</h1>
+    <p class="mood-section-desc">
+      Forget scrolling through endless genre lists. Tell us how you feel right now, and let our cinematic curation do the rest.
+    </p>
+  </div>
+
+  <div class="mood-grid">
+    {% for m in moods %}
+    <a
+      href="{% url 'recommendations:mood_results' mood_slug=m.slug %}"
+      class="mood-card"
+      style="--mood-color: {{ m.color }}; --mood-gradient: {{ m.gradient }}; --mood-glow: {{ m.color }}55;"
+      data-mood="{{ m.slug }}"
+    >
+      <div class="mood-icon-wrapper">{{ m.emoji }}</div>
+      <div class="mood-card-title">{{ m.name }}</div>
+      <div class="mood-card-desc">{{ m.description }}</div>
+      <div class="mood-card-cta">
+        <span>Get Recommendations</span>
+        <span>&rarr;</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Authenticated User's Recent Mood History -->
+  {% if user.is_authenticated and recent_history %}
+  <div style="margin-top: var(--spacing-3xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--spacing-xl);">
+    <h2 style="font-size: 1.25rem; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 0.5rem;">
+      <span>🕒</span>
+      <span>Your Recent Mood Journeys</span>
+    </h2>
+    <div style="display: flex; gap: var(--spacing-md); flex-wrap: wrap;">
+      {% for entry in recent_history %}
+      <a href="{% url 'recommendations:mood_results' mood_slug=entry.selected_mood %}" class="mood-switch-chip" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+        <strong>{{ entry.selected_mood|capfirst }}</strong>
+        <span style="color: var(--text-muted); font-size: 0.75rem;">({{ entry.selected_at|date:"M j, H:i" }})</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
